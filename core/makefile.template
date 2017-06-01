@@ -20,6 +20,8 @@ USR_LFLAGS=
 VISIT=0
 VISIT_IFLAGS=
 VISIT_LFLAGS=
+DAMARIS_IFLAGS=
+DAMARIS_LFLAGS=
 
 ################################################################################
 
@@ -78,13 +80,19 @@ ifneq ($(VISIT),0)
   USR_LFLAGS := ${USR_LFLAGS} $(VISIT_LFLAGS)
 endif
 
+ifneq ($(DAMARIS),0)
+  DAMARISNEK_INCLUDES:=-I$S/3rd_party
+  DAMARISO := damaris.o
+  USR_LFLAGS := ${USR_LFLAGS} $(DAMARIS_LFLAGS)
+endif
+
 ifeq ($(MPI),0)
 	DUMMY:= $(shell cp $S/mpi_dummy.h $S/mpif.h) 
 else
 	DUMMY:= $(shell rm -rf $S/mpif.h) 
 endif
 
-TMP1 = $(CORE) $(MXM) $(USR) $(COMM_MPI) $(NEKNEKO) $(VISITO) $(BLAS)
+TMP1 = $(CORE) $(MXM) $(USR) $(COMM_MPI) $(NEKNEKO) $(VISITO) $(DAMARISO) $(BLAS)
 
 ifeq ($(CMT),1)
 TMP1 += $(CMTCORE)
@@ -115,7 +123,7 @@ usrfile:
 	@env CASENAME=$(CASENAME) PPS="$(PPS)" $S/mkuserfile
 
 nek5000:	objdir $(NOBJS) usrfile
-	$(FC) -c $(FL2) $(CASEDIR)/${CASENAME}.f $(VISITNEK_INCLUDES) -o ${OBJDIR}/${CASENAME}.o 
+	$(FC) -c $(FL2) $(CASEDIR)/${CASENAME}.f $(VISITNEK_INCLUDES) $(DAMARISNEK_INCLUDES) -o ${OBJDIR}/${CASENAME}.o 
 	$(FC) $(FL2) -o ${BINNAME} ${OBJDIR}/${CASENAME}.o $(NOBJS) $(USR_LFLAGS) $(LDFLAGS)
 	@if test -f ${BINNAME}; then \
         echo ""; \
@@ -248,7 +256,8 @@ $(OBJDIR)/chelpers.o             :$S/chelpers.c;          $(CC) -c $(cFL2) $< -o
 $(OBJDIR)/dsygv.o     	:$S/3rd_party/dsygv.f;  	$(FC) -c $(L0) $(PPS_F) $< -o $@
 $(OBJDIR)/blas.o   	:$S/3rd_party/blas.f;		$(FC) -c $(L0) $(PPS_F) $< -o $@
 $(OBJDIR)/visit.o        :$S/3rd_party/visit.f;		$(FC) -c $(VISIT_IFLAGS) $(FL2) $< -o $@
-$(OBJDIR)/nek_in_situ.o  :$S/3rd_party/nek_in_situ.f;	$(FC) -c $(VISIT_IFLAGS) $(FL2) $< -o $@
+$(OBJDIR)/nek_in_situ.o  :$S/3rd_party/nek_in_situ.f;	$(FC) -c $(VISIT_IFLAGS) $(DAMARIS_IFLAGS) $(FL2) $< -o $@
 $(OBJDIR)/finiparser.o   :$S/3rd_party/finiparser.c;    $(CC)  -c $(cFL2) $(JL) $< -o $@
 $(OBJDIR)/iniparser.o    :$S/3rd_party/iniparser.c;     $(CC)  -c $(cFL2) $(JL) $< -o $@
 $(OBJDIR)/dictionary.o   :$S/3rd_party/dictionary.c;    $(CC)  -c $(cFL2) $(JL) $< -o $@
+$(OBJDIR)/damaris.o      :$S/3rd_party/damaris.f;     $(FC) -c $(DAMARIS_IFLAGS) $(FL2) $< -o $@

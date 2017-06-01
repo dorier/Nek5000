@@ -5,13 +5,31 @@ c-----------------------------------------------------------------------
       include 'PARALLEL'
       include 'INPUT'
 
+#ifdef ENABLE_DAMARIS
+      integer is_client
+#endif
+
 C     Find out the session name:
 C
 
       call mpi_initialized(mpi_is_initialized, ierr) !  Initialize MPI
       if ( mpi_is_initialized .eq. 0 ) call mpi_init (ierr)
 
-      call mpi_comm_dup(mpi_comm_world,intracomm,ierr)
+      nekcomm=mpi_comm_world
+
+#ifdef ENABLE_DAMARIS
+      call damaris_initialize_f('nek5.xml', mpi_comm_world, ierr)
+      call damaris_start_f(is_client, ierr)
+      if(is_client.gt.0) then
+         call damaris_client_comm_get_f(nekcomm, ierr)
+      else
+         call damaris_finalize_f(ierr)
+         call mpi_finalize(ierr)
+         stop
+      endif
+#endif
+
+      call mpi_comm_dup(nekcomm,intracomm,ierr)
       call iniproc(intracomm)
 
       CALL BLANK(SESSION,132)

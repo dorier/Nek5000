@@ -29,6 +29,10 @@ c-----------------------------------------------------------------------
 
       logical ifhigh
 
+#ifdef ENABLE_DAMARIS
+      integer is_client
+#endif
+
 C     nsessmax = upper limit for number of sessions
 C     nfldmax_nn  = max number of fields to be interpolated
 C     nmaxl_nn = max number of points at the boundary
@@ -43,11 +47,24 @@ C     and path (PATH_MULT(n-1))
       call mpi_initialized(mpi_is_initialized, ierr) !  Initialize MPI
       if ( mpi_is_initialized .eq. 0 ) call mpi_init (ierr)
 
-      call mpi_comm_size(mpi_comm_world,np_global,ierr)
-      call mpi_comm_rank(mpi_comm_world,nid_global,ierr)
+      nekcomm=mpi_comm_world
+
+#ifdef ENABLE_DAMARIS
+      call damaris_initialize_f('nek5.xml', mpi_comm_world, ierr)
+      call damaris_start_f(is_client, ierr)
+      if(is_client.gt.0) then
+         call damaris_client_comm_get_f(nekcomm, ierr)
+      else
+         call damaris_finalize_f(ierr)
+         call mpi_finalize(ierr)
+         stop
+      endif
+#endif
+
+      call mpi_comm_size(nekcomm,np_global,ierr)
+      call mpi_comm_rank(nekcomm,nid_global,ierr)
 
       nid=nid_global
-      nekcomm=mpi_comm_world
 
       ierr = 0
       if (nid_global.eq.0) then

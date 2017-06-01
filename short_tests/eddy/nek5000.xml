@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<simulation name="eddy" language="fortran" xmlns="http://damaris.gforge.inria.fr/damaris/model">
+	<architecture>
+		<domains count="1" />
+		<dedicated cores="0" nodes="0" />
+		<buffer name="damaris-buffer" size="536870912" />
+		<queue  name="damaris-queue" size="100" />
+	</architecture>
+	<data>
+
+<!--
+	For 3D cases, uncomment what is commented bellow and change the
+	mesh topology from 2 to 3.
+-->
+		<parameter name="NX1"  type="int" value="0" />
+		<parameter name="NY1"  type="int" value="0" />
+<!--
+		<parameter name="NZ1"  type="int" value="0" />
+-->
+		<layout name="block_layout"  type="double" dimensions="NX1,NY1,NZ1" />
+
+		<mesh name="mesh" type="curvilinear" topology="2">
+			<coord name="coords/xm1" label="X-Axis"/>
+			<coord name="coords/ym1" label="Y-Axis"/>
+<!--
+			<coord name="coords/zm1" label="Y-Axis"/>
+-->
+		</mesh>
+
+		<group name="coords">
+			<variable name="xm1" unit="cm" layout="block_layout" visualizable="false" time-varying="false" />
+			<variable name="ym1" unit="cm" layout="block_layout" visualizable="false" time-varying="false" />
+<!--
+			<variable name="zm1" unit="cm" layout="block_layout" visualizable="false" time-varying="false" />
+-->
+		</group>
+	
+		<variable name="x_velocity" type="scalar" layout="block_layout" mesh="mesh" centering="nodal" />
+		<variable name="y_velocity" type="scalar" layout="block_layout" mesh="mesh" centering="nodal" />
+<!--
+		<variable name="z_velocity" type="scalar" layout="block_layout" mesh="mesh" centering="nodal" />
+-->
+		<variable name="temperature" type="scalar" layout="block_layout" mesh="mesh" centering="nodal" />
+		<variable name="pressure"    type="scalar" layout="block_layout" mesh="mesh" centering="nodal" />
+	</data>
+	<actions>
+	</actions>
+	<visit>
+		<path>@VisIt_ROOT@</path>
+	</visit>
+</simulation>

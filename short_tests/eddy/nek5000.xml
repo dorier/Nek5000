@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <simulation name="eddy" language="fortran" xmlns="http://damaris.gforge.inria.fr/damaris/model">
 	<architecture>
-		<domains count="1" />
+		<domains count="256" /> <!-- this value should be equal to nelv -->
 		<dedicated cores="0" nodes="0" />
-		<buffer name="damaris-buffer" size="536870912" />
+		<buffer name="damaris-buffer" size="0" /> <!-- use MPI -->
 		<queue  name="damaris-queue" size="100" />
 	</architecture>
 	<data>
@@ -17,7 +17,10 @@
 <!--
 		<parameter name="NZ1"  type="int" value="0" />
 -->
+		<layout name="block_layout"  type="double" dimensions="NX1,NY1" />
+<!--
 		<layout name="block_layout"  type="double" dimensions="NX1,NY1,NZ1" />
+-->
 
 		<mesh name="mesh" type="curvilinear" topology="2">
 			<coord name="coords/xm1" label="X-Axis"/>
@@ -45,7 +48,4 @@
 	</data>
 	<actions>
 	</actions>
-	<visit>
-		<path>@VisIt_ROOT@</path>
-	</visit>
 </simulation>

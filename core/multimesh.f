@@ -50,7 +50,8 @@ C     and path (PATH_MULT(n-1))
       nekcomm=mpi_comm_world
 
 #ifdef ENABLE_DAMARIS
-      call damaris_initialize_f('nek5.xml', mpi_comm_world, ierr)
+      print *, "INITIALIZING DAMARIS"
+      call damaris_initialize_f('nek5000.xml', mpi_comm_world, ierr)
       call damaris_start_f(is_client, ierr)
       if(is_client.gt.0) then
          call damaris_client_comm_get_f(nekcomm, ierr)

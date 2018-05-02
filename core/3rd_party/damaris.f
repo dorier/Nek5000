@@ -21,16 +21,17 @@ c---------------------------------------------------------------------
       save first
       data first /1/
 
+      print *, "CALLING DAMARIS_CHECK()"
       if (first.eq.1) then
          call damaris_parameter_set_f("NX1",nx1,SIZEOF(nx1),ierr)
          call damaris_parameter_set_f("NY1",ny1,SIZEOF(ny1),ierr)
          if(IF3D) then
            call damaris_parameter_set_f("NZ1",nz1,SIZEOF(nz1),ierr)
          endif
-         first = first+1
       endif
 
       do block=1,nelv
+        if (first.eq.1) then
          call damaris_write_block_f("coords/xm1", block-1, 
      &                               xm1(1,1,1,block),ierr)
          call damaris_write_block_f("coords/ym1", block-1, 
@@ -39,6 +40,8 @@ c---------------------------------------------------------------------
            call damaris_write_block_f("coords/zm1", block-1, 
      &                               zm1(1,1,1,block),ierr)
          endif
+        endif
+         
          call damaris_write_block_f("x_velocity", block-1, 
      &                               VX(1,1,1,block), ierr)
          call damaris_write_block_f("y_velocity", block-1, 
@@ -54,6 +57,10 @@ c---------------------------------------------------------------------
       enddo
 
       call damaris_end_iteration_f(ierr)
+
+      if(first.eq.1) then
+        first = first+1
+      endif
 
       end
 
